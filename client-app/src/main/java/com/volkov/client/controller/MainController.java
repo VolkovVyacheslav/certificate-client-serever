@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/certificates/index")
+@RequestMapping("/")
 public class MainController {
 
     private final MessageSource messageSource;
@@ -25,5 +25,10 @@ public class MainController {
     public String createCertificateSchedule(CertificateModel certificateModel,
                                             Model model){
         return "/certificates/index/certificate";
+    }
+
+    @GetMapping("index")
+    public String getMainPage(Model model) {
+        return "/certificates/index";
     }
 }
