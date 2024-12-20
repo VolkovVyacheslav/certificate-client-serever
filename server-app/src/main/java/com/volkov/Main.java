@@ -1,5 +1,9 @@
 package com.volkov;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.jcajce.provider.asymmetric.ecgost12.KeyFactorySpi;
+import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.io.pem.PemWriter;
 
 import javax.net.ssl.SSLSocket;
@@ -44,7 +48,13 @@ public class Main {
             PemWriter pw = new PemWriter(out);
 
             for (Certificate crt : certificates) {
-                System.out.println( crt.toString());
+                BouncyCastleProvider provider = new BouncyCastleProvider();
+                AsymmetricKeyInfoConverter asymmetricKeyInfoConverter = new KeyFactorySpi();
+                ASN1ObjectIdentifier asn1 = new ASN1ObjectIdentifier("1.2.840.113554.1.2.1");
+                provider.addKeyInfoConverter(asn1, asymmetricKeyInfoConverter);
+                provider.store(pw, String.valueOf(crt));
+//                System.out.println( crt.toString());
+                System.out.println(provider.getInfo());
             }
             /* read response */
             in = new BufferedReader(
