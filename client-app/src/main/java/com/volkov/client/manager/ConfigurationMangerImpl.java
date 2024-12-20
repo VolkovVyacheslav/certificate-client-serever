@@ -4,6 +4,8 @@ import com.volkov.client.manager.exception.SaveConfigException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -18,7 +20,7 @@ public class ConfigurationMangerImpl implements ConfigurationManger {
 
     private static final String PREF_KEY_SERVER_URL = "server.http.url";
     private static final String PREF_KEY_SERVER_PORT = "server.http.port";
-    private static final String CONFIG_FILE_PATH = "client.properties";
+    private static final String CONFIG_FILE_PATH = "./client.properties";
 
     private Properties prop = new Properties();
 
