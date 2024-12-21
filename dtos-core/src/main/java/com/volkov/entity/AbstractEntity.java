@@ -1,6 +1,7 @@
 package com.volkov.entity;
 
 
+import com.volkov.enums.EntityTypeEnum;
 import com.volkov.provider.IEntity;
 import com.volkov.provider.IGRUDEnumProvider;
 import com.volkov.provider.INameProvider;
@@ -19,7 +20,13 @@ public abstract class AbstractEntity<ID extends Serializable>
 
     protected String name;
 
+    protected EntityTypeEnum typeEnum;
+
     public String getName(){
         return String.valueOf(getId());
+    }
+
+    EntityTypeEnum getTypeEnum(){
+        return typeEnum;
     }
 }

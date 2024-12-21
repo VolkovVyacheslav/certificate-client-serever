@@ -2,11 +2,8 @@ package com.volkov.provider;
 
 import java.io.Serializable;
 
-public interface IGRUDEnumProvider<> {
+public interface IGRUDEnumProvider<E> {
 
-    String selectQuery = "";
-
-    String saveQuery = "";
 
     String getSelectQuery();
 

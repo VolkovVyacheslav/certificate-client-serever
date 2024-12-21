@@ -1,29 +1,20 @@
 package com.volkov.dao.impl;
 
-import com.sun.org.apache.xerces.internal.dom.EntityImpl;
-import com.sun.rowset.internal.Row;
-import com.volkov.converter.AbstractConverter;
-import com.volkov.converter.impl.AbstractConverterImpl;
 import com.volkov.dao.DbTemplate;
-import com.volkov.entity.AbstractEntity;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class DbTemplateImpl implements DbTemplate {
 
     private final String DB_DRIVER_NAME = "org.postgresql.Driver";
+    private final String DB_CREATE_CERTIFICATE_TABLE = "CREATE TABLE IF NOT EXISTS certificates (";
+    private final String DB_CREATE_SCHEDULE_TABLE = "CREATE TABLE IF NOT EXISTS schedule (id BIGSERIAL NOT NULL, ";
 
     private Connection conn;
-    private Statement stmt;
-    private ResultSet rs;
     private String url;
     private String user;
     private String password;
 
-    private <C extends AbstractConverter> converter = new AbstractConverterImpl();
 
     public DbTemplateImpl(String url, String user, String password) {
         this.url = url;
@@ -32,6 +23,9 @@ public class DbTemplateImpl implements DbTemplate {
         try {
             Class.forName(DB_DRIVER_NAME);
             this.conn = DriverManager.getConnection(url, user, password);
+            if (!conn.isValid(5)){
+                throw new SQLException();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -58,15 +52,26 @@ public class DbTemplateImpl implements DbTemplate {
     }
 
     @Override
-    public <E extends AbstractEntity> List<E> getEtitys(String query) throws SQLException {
-        if (getResultSetByQuery(query).next()){
-            List<E> entities = new ArrayList<>();
-            entities.add((E)new EntityImpl(getResultSetByQuery(query)));
+    public void init(){
+        try {
+            if (null != conn) {
+                int result = 0;
+                Statement stmt = conn.createStatement();
+                result = stmt.executeUpdate(DB_CREATE_CERTIFICATE_TABLE);
+                result = +stmt.executeUpdate(DB_CREATE_SCHEDULE_TABLE);
+                if (result < 2){
+                    System.out.println("Warning! DB create exception, or DB already exist");
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
         }
-        return Collections.emptyList();
     }
 
-    private ResultSet getResultSetByQuery(String query) throws SQLException {
+    @Override
+    public ResultSet executeReadQuery(String query) throws SQLException {
+        Statement stmt;
+        ResultSet rs = null;
         try {
             if (null != conn) {
                 if (!conn.isClosed()) {
@@ -82,33 +87,12 @@ public class DbTemplateImpl implements DbTemplate {
         return rs;
     }
 
-    @Override
-    public ResultSet saveResultSet(ResultSet resultSet) throws SQLException {
-       for (Row row : resultSet) {
 
-       }
-        return null;
-    }
-
-    @Override
-    public ResultSet saveResultSet(ResultSet resultSet, Object... params) throws SQLException {
-        return null;
-    }
-
-
-    @Override
-    public void executeUpdate(String query) throws SQLException {
-
-    }
-
-    @Override
-    public void delete(String query) throws SQLException {
-
-    }
 
     @Override
     public void close() throws SQLException {
-       stmt.close();
-       conn.close();
+        if (null != conn && !conn.isClosed()) {
+            conn.close();
+        }
     }
 }
